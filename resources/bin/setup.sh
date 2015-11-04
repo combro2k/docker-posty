@@ -23,10 +23,10 @@ load_rvm()
 }
 
 pre_install() {
+    sudo mkdir -p /var/vmail || return 1
     sudo chmod +x /usr/local/bin/* || return 1
 
     mkdir -p /home/app/posty_api || return 1
-    mkdir -p /var/vmail || return 1
 
     sudo apt-get update 2>&1 || return 1
 	sudo apt-get install -yq ${PACKAGES[@]} 2>&1 || return 1
