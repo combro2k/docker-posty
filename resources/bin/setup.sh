@@ -6,6 +6,7 @@ export DEBIAN_FRONTEND="noninteractive"
 
 PACKAGES=(
     'libmysqlclient-dev'
+    'mysql-client'
 )
 
 load_rvm()

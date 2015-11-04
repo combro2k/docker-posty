@@ -29,6 +29,7 @@ production:
   username: '${POSTY_USER}'
   password: '${POSTY_PASSWORD}'
   host: '${MYSQL_PORT_3306_TCP_ADDR}'
+  port: '${MYSQL_PORT_3306_TCP_PORT}'
 #  socket: mysql socket path (/var/mysql/mysql.sock)
 EOF
 
@@ -50,4 +51,15 @@ export RACK_ENV=production
 
 rake db:migrate
 
-exec rackup
+API_KEY=$(mysql -s -h ${MYSQL_PORT_3306_TCP_ADDR} -u ${POSTY_USER} -p"${POSTY_PASSWORD}" ${POSTY_DATABASE} <<< 'SELECT access_token FROM api_keys ORDER BY ID DESC LIMIT 1;')
+
+if [ -z ${API_KEY} ]; then
+    echo -e "\e[31mGenerating API key...\e[0m"
+    rake api_key:generate > /dev/null 2>&1
+    API_KEY=$(mysql -s -h ${MYSQL_PORT_3306_TCP_ADDR} -u ${POSTY_USER} -p"${POSTY_PASSWORD}" ${POSTY_DATABASE} <<< 'SELECT access_token FROM api_keys ORDER BY ID DESC LIMIT 1;')
+fi
+
+echo -e "\e[31mUsing API key: ${API_KEY} \e[0m"
+
+exec rackup 2>&1
+
