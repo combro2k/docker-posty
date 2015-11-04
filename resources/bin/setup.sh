@@ -26,6 +26,7 @@ pre_install() {
     sudo chmod +x /usr/local/bin/* || return 1
 
     mkdir -p /home/app/posty_api || return 1
+    mkdir -p /var/vmail || return 1
 
     sudo apt-get update 2>&1 || return 1
 	sudo apt-get install -yq ${PACKAGES[@]} 2>&1 || return 1
@@ -56,7 +57,7 @@ post_install() {
 	sudo apt-get autoclean 2>&1 || return 1
 	sudo rm -fr /var/lib/apt 2>&1 || return 1
 
-	sudo chown ${APP_USER}:${APP_USER} ${APP_HOME} -R
+	sudo chown ${APP_USER}:${APP_USER} ${APP_HOME} /var/vmail -R
 
 	return 0
 }
