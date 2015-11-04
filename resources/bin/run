@@ -1,0 +1,53 @@
+#!/bin/bash
+
+set -e
+
+test -z "${MYSQL_PORT_3306_TCP_ADDR}" && echo "Can not run without MySQL link!" && exit 1
+test -z "${MYSQL_PORT_3306_TCP_PORT}" && echo "Can not run without MySQL link!" && exit 1
+
+. /usr/local/bin/setup.sh load_rvm
+
+if [ -z ${POSTY_DATABASE} ]; then
+    POSTY_DATABASE='posty_api'
+fi
+
+if [ -z ${POSTY_USER} ]; then
+    POSTY_USER='posty_api'
+fi
+
+if [ -z ${POSTY_PASSWORD} ]; then
+    POSTY_PASSWORD='P0stY_ApI'
+fi
+
+cat <<EOF > ${APP_HOME}/posty_api/config/database.yml
+production:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: true
+  database: '${POSTY_DATABASE}'
+  pool: 5
+  username: '${POSTY_USER}'
+  password: '${POSTY_PASSWORD}'
+  host: '${MYSQL_PORT_3306_TCP_ADDR}'
+#  socket: mysql socket path (/var/mysql/mysql.sock)
+EOF
+
+cat <<EOF > ${APP_HOME}/.posty_client.yml
+development:
+  # this is the posty Url put here your url where the posty-api is stored
+  api_url: http://localhost:9292/api/
+  # this is the version from the posty api
+  api_version: v1
+  access_token: ask your admin
+
+production:
+  api_url: http://localhost:9292/api/
+  api_version: v1
+  access_token: ask your admin
+EOF
+
+export RACK_ENV=production
+
+rake db:migrate
+
+exec rackup
