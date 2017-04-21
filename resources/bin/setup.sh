@@ -29,9 +29,9 @@ pre_install() {
     mkdir -p /home/app/posty_api || return 1
 
     sudo apt-get update 2>&1 || return 1
-	sudo apt-get install -yq ${PACKAGES[@]} 2>&1 || return 1
+    sudo apt-get install -yq ${PACKAGES[@]} 2>&1 || return 1
 
-	return 0
+    return 0
 }
 
 install_posty_api()
@@ -41,6 +41,8 @@ install_posty_api()
 
     cd /home/app/posty_api 2>&1 || return 1
 
+    # Fix issues with json gem .. 
+    bundle update json 2>&1 || return 1
     bundle install 2>&1 || return 1
 
     return 0
